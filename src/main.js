@@ -80,10 +80,10 @@ const formatTime = (sec) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'Listening': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-    case 'Speaking': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-    case 'Processing': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
-    case 'Escalated': return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+    case 'Listening': return 'text-blue-400 bg-blue-500/20 border-blue-500/30 shadow-[0_0_10px_-5px_rgba(59,130,246,0.3)]';
+    case 'Speaking': return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30 shadow-[0_0_10px_-5px_rgba(16,185,129,0.3)]';
+    case 'Processing': return 'text-amber-400 bg-amber-500/20 border-amber-500/30 shadow-[0_0_10px_-5px_rgba(245,158,11,0.3)]';
+    case 'Escalated': return 'text-rose-400 bg-rose-500/20 border-rose-500/30 shadow-[0_0_10px_-5px_rgba(244,63,94,0.3)]';
     default: return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
   }
 };
@@ -207,7 +207,7 @@ function renderCalls() {
 function renderTranscript() {
   if (!els.containers.transcriptTarget || !els.containers.transcriptContainer) return;
 
-  els.containers.transcriptTarget.textContent = `CALL #${state.focusedCallId} • LIVE`;
+  els.containers.transcriptTarget.innerHTML = `CALL <span class="text-white">#${state.focusedCallId}</span> • <span class="text-emerald-500 animate-pulse">LIVE</span>`;
 
   const html = state.transcript.map((msg, idx) => {
     const isLast = idx === state.transcript.length - 1;
@@ -215,12 +215,12 @@ function renderTranscript() {
 
     return `
         <div class="flex gap-4 ${isLast ? 'animate-[slideUp_0.3s_ease-out]' : ''} ${isAI ? '' : 'flex-row-reverse'} group">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${isAI ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold shadow-lg ${isAI ? 'bg-zinc-800 text-emerald-400 border border-emerald-500/30 shadow-emerald-500/20' : 'bg-blue-900/50 text-blue-400 border border-blue-500/30 shadow-blue-500/20'}">
                 ${isAI ? 'AI' : 'U'}
             </div>
             <div class="flex flex-col gap-1 max-w-[85%] ${isAI ? 'items-start' : 'items-end'}">
-                <span class="text-[10px] uppercase tracking-wider font-bold opacity-50 ${isAI ? 'text-emerald-500' : 'text-blue-500'} mb-0.5">${msg.speaker}</span>
-                <p class="text-[15px] leading-relaxed px-3 py-2 rounded-2xl ${isAI ? 'bg-zinc-800/50 text-zinc-100 rounded-tl-none border border-white/5' : 'bg-blue-500/10 text-blue-50 rounded-tr-none border border-blue-500/10'} shadow-sm">
+                <span class="text-[10px] uppercase tracking-wider font-bold opacity-50 ${isAI ? 'text-emerald-500' : 'text-blue-500'} mb-0.5 ml-1">${msg.speaker}</span>
+                <p class="text-[14px] leading-relaxed px-4 py-3 rounded-2xl ${isAI ? 'bg-zinc-800 text-zinc-100 rounded-tl-none border border-white/5 shadow-md shadow-black/50' : 'bg-blue-600/20 text-blue-50 rounded-tr-none border border-blue-500/20 shadow-md shadow-black/50'}">
                     ${msg.text}
                 </p>
             </div>
@@ -228,7 +228,7 @@ function renderTranscript() {
     `}).join('');
 
   if (els.containers.transcriptContainer.innerHTML !== html) {
-    els.containers.transcriptContainer.innerHTML = html + '<div class="h-1"></div>';
+    els.containers.transcriptContainer.innerHTML = html + '<div class="h-4"></div>';
     els.containers.transcriptContainer.scrollTop = els.containers.transcriptContainer.scrollHeight;
   }
 }
