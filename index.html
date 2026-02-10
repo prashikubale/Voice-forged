@@ -74,131 +74,207 @@
     </div>
 
     <!-- HERO PREVIEW (Dashboard UI Mockup) -->
-    <!-- ... (Previous Hero Preview Code) ... -->
     <div
-      class="relative w-full max-w-5xl mx-auto h-[300px] md:h-[500px] bg-zinc-900 border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl shadow-black/50 animate-[fadeIn_1.5s_ease-out_0.8s_both] group">
-      <!-- ... (Keep existing inner content exactly as is, just using this match block to anchor) ... -->
+      class="relative w-full max-w-5xl mx-auto h-[350px] md:h-[550px] bg-zinc-950 border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl shadow-black/50 animate-[fadeIn_1.5s_ease-out_0.8s_both] group">
+      <!-- Top Bar (Mac OS dots + Search) -->
+      <div class="h-8 bg-zinc-900 border-b border-white/5 flex items-center px-4 justify-between">
+        <div class="flex gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+          <div class="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500/50"></div>
+          <div class="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
+        </div>
+        <div class="h-4 w-64 bg-zinc-800/50 rounded-full border border-white/5"></div>
+      </div>
+
       <!-- Mock Interface -->
-      <div class="absolute inset-0 flex flex-col">
+      <div class="absolute inset-0 top-8 flex flex-col bg-zinc-950/50">
         <!-- Mock Header -->
-        <div class="h-12 border-b border-white/5 flex items-center px-6 gap-4 bg-zinc-950/50 backdrop-blur-sm">
-          <div class="flex gap-2">
-            <div class="h-3 w-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
-            <div class="h-3 w-3 rounded-full bg-amber-500/20 border border-amber-500/50"></div>
-            <div class="h-3 w-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
+        <div
+          class="h-16 border-b border-white/5 flex items-center px-8 justify-between bg-zinc-900/10 backdrop-blur-sm">
+          <div class="flex items-center gap-4">
+            <div class="h-8 w-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30"></div>
+            <div class="flex flex-col gap-1">
+              <div class="h-3 w-32 bg-white/10 rounded-full"></div>
+              <div class="h-2 w-20 bg-white/5 rounded-full"></div>
+            </div>
           </div>
-          <div class="h-4 w-64 rounded-full bg-white/5"></div>
+          <div class="h-8 w-32 rounded-full bg-zinc-800/50 border border-white/5"></div>
         </div>
+
         <!-- Mock Body -->
-        <div class="flex-1 flex p-6 gap-6 overflow-hidden">
-          <!-- Sidebar -->
-          <div class="w-16 flex flex-col gap-4 hidden md:flex">
-            <div class="h-10 w-10 rounded-xl bg-white/5"></div>
-            <div class="h-10 w-10 rounded-xl bg-white/5"></div>
-            <div class="h-10 w-10 rounded-xl bg-white/5"></div>
-            <div class="mt-auto h-10 w-10 rounded-full bg-white/10"></div>
-          </div>
-          <!-- Main Area -->
-          <div class="flex-1 flex flex-col gap-4">
-            <!-- Stats Row -->
-            <div class="grid grid-cols-3 gap-4">
-              <div class="h-24 bg-white/5 rounded-2xl border border-white/5 p-4 flex flex-col gap-2">
-                <div class="h-3 w-16 bg-white/10 rounded-full"></div>
-                <div class="h-8 w-12 bg-emerald-500/20 rounded-lg mt-auto animate-pulse"></div>
-              </div>
-              <div class="h-24 bg-white/5 rounded-2xl border border-white/5 p-4 flex flex-col gap-2">
-                <div class="h-3 w-16 bg-white/10 rounded-full"></div>
-                <div class="h-8 w-24 bg-white/10 rounded-lg mt-auto"></div>
-              </div>
-              <div class="h-24 bg-white/5 rounded-2xl border border-white/5 p-4 flex flex-col gap-2">
-                <div class="h-3 w-16 bg-white/10 rounded-full"></div>
-                <div class="h-8 w-full bg-white/5 rounded-lg mt-auto overflow-hidden relative">
-                  <div
-                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite]">
-                  </div>
-                </div>
-              </div>
+        <div class="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
+
+          <!-- Metric Row (4 Cards) -->
+          <div class="grid grid-cols-4 gap-4 h-24">
+            <div class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+              <div class="h-1.5 w-12 bg-white/20 rounded-full"></div>
+              <div class="h-6 w-20 bg-white/10 rounded"></div>
             </div>
-            <!-- Graph/Chart Area -->
-            <div class="flex-1 bg-zinc-950/50 rounded-2xl border border-white/5 relative overflow-hidden">
-              <!-- Grid Lines -->
-              <div class="absolute inset-x-0 top-1/4 h-px bg-white/5"></div>
-              <div class="absolute inset-x-0 top-2/4 h-px bg-white/5"></div>
-              <div class="absolute inset-x-0 top-3/4 h-px bg-white/5"></div>
-              <div class="absolute inset-y-0 left-1/4 w-px bg-white/5"></div>
-              <div class="absolute inset-y-0 left-2/4 w-px bg-white/5"></div>
-              <div class="absolute inset-y-0 left-3/4 w-px bg-white/5"></div>
-              <!-- Simulated Wave -->
-              <div class="absolute inset-0 flex items-center justify-center gap-1 opacity-50">
-                <div class="w-2 h-16 bg-emerald-500/50 rounded-full animate-[pulse_0.5s_ease-in-out_infinite]"></div>
-                <div class="w-2 h-24 bg-emerald-500/50 rounded-full animate-[pulse_0.6s_ease-in-out_infinite]"></div>
-                <div class="w-2 h-12 bg-emerald-500/50 rounded-full animate-[pulse_0.7s_ease-in-out_infinite]"></div>
-                <div class="w-2 h-32 bg-emerald-500/50 rounded-full animate-[pulse_0.4s_ease-in-out_infinite]"></div>
-                <div class="w-2 h-20 bg-emerald-500/50 rounded-full animate-[pulse_0.8s_ease-in-out_infinite]"></div>
-              </div>
+            <div class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+              <div class="h-1.5 w-16 bg-white/20 rounded-full"></div>
+              <div class="h-6 w-24 bg-emerald-500/20 rounded"></div>
+            </div>
+            <div class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+              <div class="h-1.5 w-10 bg-white/20 rounded-full"></div>
+              <div class="h-6 w-16 bg-amber-500/20 rounded"></div>
+            </div>
+            <div class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between">
+              <div class="h-1.5 w-14 bg-white/20 rounded-full"></div>
+              <div class="h-6 w-12 bg-white/10 rounded"></div>
             </div>
           </div>
+
+          <!-- Main Chart Container -->
+          <div
+            class="flex-1 bg-zinc-900/40 border border-white/5 rounded-2xl p-6 relative flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+              <div class="space-y-2">
+                <div class="h-3 w-40 bg-white/10 rounded"></div>
+                <div class="h-2 w-64 bg-white/5 rounded"></div>
+              </div>
+              <div class="h-6 w-24 bg-zinc-800 rounded border border-white/5"></div>
+            </div>
+
+            <!-- Fake Curve -->
+            <div class="flex-1 w-full relative">
+              <svg class="absolute inset-0 w-full h-full text-indigo-500/20" preserveAspectRatio="none"
+                viewBox="0 0 400 200">
+                <!-- Gradient Defs -->
+                <defs>
+                  <linearGradient id="mockGradient" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3" />
+                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <!-- Path -->
+                <path
+                  d="M0,150 C40,140 80,100 120,110 C160,120 200,80 240,90 C280,100 320,140 360,130 C400,120 400,120 400,200 L0,200 Z"
+                  fill="url(#mockGradient)" />
+                <path d="M0,150 C40,140 80,100 120,110 C160,120 200,80 240,90 C280,100 320,140 360,130 C400,120 400,120"
+                  fill="none" stroke="#818cf8" stroke-width="2" />
+              </svg>
+
+              <!-- Pulse Dot -->
+              <div
+                class="absolute right-0 top-[60%] w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_currentColor] animate-ping">
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>
-      <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent pointer-events-none">
-      </div>
-      <div
-        class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 px-4 py-2 bg-zinc-800/80 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 shadow-xl">
-        <span class="text-[10px] font-bold text-white uppercase tracking-wider">Live System Preview</span>
       </div>
     </div>
 
-    <!-- LOGO SCROLL (Trust Indicator) -->
-    <div class="w-full mt-24 overflow-hidden relative fade-sides"
-      style="mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
-      <p class="text-center text-zinc-600 text-xs font-mono uppercase tracking-widest mb-8">Trusted by Autonomous
-        Leaders</p>
-      <div
-        class="flex w-max animate-marquee gap-24 items-center opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-        <!-- Set 1 -->
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded bg-white"></div> CYBERDYNE
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-full bg-white"></div> Massive Dynamic
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rotate-45 bg-white"></div> TYRELL CORP
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-sm bg-white"></div> OMNI CONSUMER
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-full border-2 border-white"></div> WEYLAND
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-tr-xl bg-white"></div> APERTURE
-        </div>
-        <!-- Set 2 (Duplicate for loop) -->
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded bg-white"></div> CYBERDYNE
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-full bg-white"></div> Massive Dynamic
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rotate-45 bg-white"></div> TYRELL CORP
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-sm bg-white"></div> OMNI CONSUMER
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-full border-2 border-white"></div> WEYLAND
-        </div>
-        <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
-          <div class="w-4 h-4 rounded-tr-xl bg-white"></div> APERTURE
+    <!-- Feature Grid / Global Mesh -->
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent pointer-events-none z-20 h-full">
+    </div>
+
+    <div
+      class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 px-4 py-2 bg-zinc-800/80 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2 shadow-xl">
+      <span class="text-[10px] font-bold text-white uppercase tracking-wider">Live System Preview</span>
+    </div>
+
+    <!-- Rest of content moved down for spacing -->
+    <div class="w-full mt-32">
+      <!-- LOGO SCROLL (Trust Indicator) -->
+      <div class="w-full overflow-hidden relative fade-sides"
+        style="mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
+        <p class="text-center text-zinc-600 text-xs font-mono uppercase tracking-widest mb-8">Trusted by Autonomous
+          Leaders</p>
+        <div
+          class="flex w-max animate-marquee gap-24 items-center opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+          <!-- Set 1 -->
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded bg-white"></div> CYBERDYNE
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-full bg-white"></div> Massive Dynamic
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rotate-45 bg-white"></div> TYRELL CORP
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-sm bg-white"></div> OMNI CONSUMER
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-full border-2 border-white"></div> WEYLAND
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-tr-xl bg-white"></div> APERTURE
+          </div>
+          <!-- Set 2 (Duplicate for loop) -->
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded bg-white"></div> CYBERDYNE
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-full bg-white"></div> Massive Dynamic
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rotate-45 bg-white"></div> TYRELL CORP
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-sm bg-white"></div> OMNI CONSUMER
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-full border-2 border-white"></div> WEYLAND
+          </div>
+          <div class="flex items-center gap-3 font-bold text-xl text-zinc-300">
+            <div class="w-4 h-4 rounded-tr-xl bg-white"></div> APERTURE
+          </div>
         </div>
       </div>
     </div>
+
 
     <!-- FEATURE STRIP -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-24 border-t border-white/5 pt-16">
-      <!-- ... (Existing Feature cards) ... -->
+      <!-- Feature 1 -->
+      <div class="flex flex-col gap-3 reveal delay-100">
+        <div
+          class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-emerald-500 mb-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Ultra-Low Latency</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed">
+          Powered by a global edge network, effectively eliminating conversational lag.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="flex flex-col gap-3 reveal delay-300">
+        <div
+          class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-blue-500 mb-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Live Telemetry</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed">
+          Inspect call state, intent classification, and audio buffers in real-time.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="flex flex-col gap-3 reveal delay-500">
+        <div
+          class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-purple-500 mb-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Enterprise Security</h3>
+        <p class="text-sm text-zinc-500 leading-relaxed">
+          SOC2 compliant infrastructure with end-to-end encryption for all audio streams.
+        </p>
+      </div>
     </div>
 
     <!-- GLOBAL INFRASTRUCTURE (Crazy Stuff) -->
@@ -264,54 +340,6 @@
       </div>
     </section>
 
-    <!-- Feature 1 -->
-    <div class="flex flex-col gap-3 reveal delay-100">
-      <div
-        class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-emerald-500 mb-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-bold text-white">Ultra-Low Latency</h3>
-      <p class="text-sm text-zinc-500 leading-relaxed">
-        Powered by a global edge network, effectively eliminating conversational lag.
-      </p>
-    </div>
-
-    <!-- Feature 2 -->
-    <div class="flex flex-col gap-3 reveal delay-300">
-      <div
-        class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-blue-500 mb-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-          </path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-bold text-white">Live Telemetry</h3>
-      <p class="text-sm text-zinc-500 leading-relaxed">
-        Inspect call state, intent classification, and audio buffers in real-time.
-      </p>
-    </div>
-
-    <!-- Feature 3 -->
-    <div class="flex flex-col gap-3 reveal delay-500">
-      <div
-        class="h-10 w-10 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-purple-500 mb-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-          </path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-bold text-white">Enterprise Security</h3>
-      <p class="text-sm text-zinc-500 leading-relaxed">
-        SOC2 compliant infrastructure with end-to-end encryption for all audio streams.
-      </p>
-    </div>
-
-    </div>
-
   </main>
 
   <!-- Footer -->
@@ -349,6 +377,11 @@
     .fade-sides {
       mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
       -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+
+    .mask-image-b {
+      mask-image: linear-gradient(to bottom, black 80%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent);
     }
 
     @keyframes fadeIn {

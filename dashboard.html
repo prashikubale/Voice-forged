@@ -5,275 +5,160 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Voice Forge Intelligence</title>
+  <style>
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 0px;
+    }
+
+    body {
+      font-feature-settings: "cv11", "ss01";
+    }
+  </style>
 </head>
 
 <body
-  class="bg-zinc-950 text-zinc-100 min-h-screen font-sans selection:bg-emerald-500/30 antialiased overflow-x-hidden">
-  <div id="app" class="pb-8 max-w-[1800px] mx-auto">
+  class="bg-zinc-950 text-zinc-200 h-screen w-screen overflow-hidden font-sans selection:bg-indigo-500/30 flex flex-col">
 
-    <!-- Header -->
-    <header class="px-6 py-6 mb-4 flex items-center justify-between">
+  <!-- 1. Professional Header -->
+  <header
+    class="h-16 border-b border-white/5 bg-zinc-900/50 flex items-center justify-between px-6 shrink-0 z-20 backdrop-blur-sm">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+          </path>
+        </svg>
+      </div>
       <div>
-        <h1 class="text-3xl font-black tracking-tighter text-white">
-          Voice <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Forge</span>
-        </h1>
-        <p class="text-xs text-zinc-500 font-medium tracking-widest uppercase mt-1">Real-Time Intelligence Unit</p>
+        <h1 class="text-sm font-bold text-white tracking-tight">Analytics Dashboard</h1>
+        <p class="text-[10px] text-zinc-500 font-medium">REAL-TIME OVERVIEW</p>
       </div>
-      <div class="flex items-center gap-4">
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-full border border-white/5">
-          <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">System Optimal</span>
+    </div>
+
+    <!-- Time Window Controls (Visual only for now) -->
+    <div class="flex bg-zinc-900 border border-white/5 rounded-lg p-1">
+      <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">1H</button>
+      <button class="px-3 py-1 text-xs font-bold bg-white/10 text-white rounded shadow-sm">24H</button>
+      <button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">7D</button>
+    </div>
+  </header>
+
+  <!-- 2. Main Workspace -->
+  <main class="flex-1 flex flex-col p-6 gap-6 min-h-0 bg-zinc-950 relative">
+
+    <!-- Metrics Overview Row -->
+    <div class="grid grid-cols-4 gap-4 shrink-0">
+      <!-- Card 1: Volume -->
+      <div
+        class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 cursor-pointer hover:border-white/20 transition-all group active-metric border-l-2 border-l-indigo-500"
+        data-view="volume">
+        <div class="flex justify-between items-start mb-2">
+          <span
+            class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-400 transition-colors">Total
+            Volume</span>
+          <span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">+12.5%</span>
         </div>
-      </div>
-    </header>
-
-    <!-- Top KPI Grid -->
-    <section class="grid grid-cols-1 gap-6 px-4 lg:px-6 mb-8">
-      <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-medium text-white flex items-center gap-2">
-          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-            </path>
-          </svg>
-          System Vital Signs
-        </h2>
-        <p class="text-sm text-zinc-500">Real-time overview of current call volume and agent performance.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-        <!-- Primary Live Ops (Prominent) -->
-        <div
-          class="md:col-span-12 lg:col-span-3 bg-gradient-to-br from-zinc-900 via-zinc-900 to-black border border-emerald-500/20 p-6 rounded-3xl relative overflow-hidden group hover:border-emerald-500/40 transition-all shadow-[0_0_40px_-10px_rgba(16,185,129,0.1)]">
-          <div
-            class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-700">
-            <svg class="w-24 h-24 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-            </svg>
-          </div>
-          <div class="flex flex-col h-full justify-between relative z-10">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 box-shadow-glow"></span>
-              </span>
-              <span class="text-sm font-bold text-emerald-400 uppercase tracking-widest text-shadow-sm">Active
-                Lines</span>
-            </div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-6xl font-black text-white tracking-tighter drop-shadow-lg"
-                id="stat-active-calls">--</span>
-              <span class="text-emerald-500/50 text-xl font-medium">/ 500</span>
-            </div>
-            <div class="mt-4 h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
-              <div class="h-full bg-emerald-500 w-1/3 animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Secondary Live Stats -->
-        <div class="md:col-span-6 lg:col-span-3 flex flex-col gap-4">
-          <!-- Queue -->
-          <div
-            class="flex-1 bg-zinc-900 border border-white/5 p-5 rounded-2xl flex items-center justify-between hover:border-white/10 transition-colors group">
-            <div class="flex flex-col gap-1">
-              <span
-                class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider group-hover:text-zinc-400 transition-colors">In
-                Queue</span>
-              <span class="text-3xl font-bold text-white tracking-tight" id="stat-queue">--</span>
-            </div>
-            <div
-              class="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:bg-zinc-700 group-hover:text-zinc-300 transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
-                </path>
-              </svg>
-            </div>
-          </div>
-          <!-- Status -->
-          <div
-            class="flex-1 bg-zinc-900 border border-white/5 p-5 rounded-2xl flex items-center justify-between hover:border-white/10 transition-colors group">
-            <div class="flex flex-col gap-1">
-              <span
-                class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider group-hover:text-zinc-400 transition-colors">AI
-                Status</span>
-              <span class="text-xl font-bold text-emerald-400 tracking-tight" id="stat-ai-status">--</span>
-            </div>
-            <div class="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
-                </path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Aggregate Metrics (Subtle) -->
-        <div class="md:col-span-6 lg:col-span-6 grid grid-cols-3 gap-4">
-          <div
-            class="bg-zinc-900/50 border border-white/5 p-5 rounded-2xl flex flex-col justify-center gap-1 hover:bg-zinc-900 hover:border-white/10 transition-all duration-300 group">
-            <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider group-hover:text-zinc-400">Total
-              Calls</span>
-            <span class="text-2xl font-bold text-zinc-200 group-hover:text-white" id="stat-total-calls">0</span>
-            <div class="text-[10px] text-emerald-500 font-mono">+12% vs last hr</div>
-          </div>
-          <div
-            class="bg-zinc-900/50 border border-white/5 p-5 rounded-2xl flex flex-col justify-center gap-1 hover:bg-zinc-900 hover:border-white/10 transition-all duration-300 group">
-            <span class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider group-hover:text-zinc-400">Avg
-              Duration</span>
-            <span class="text-2xl font-bold text-zinc-200 group-hover:text-white" id="stat-avg-duration">0:00</span>
-            <div class="text-[10px] text-zinc-600 font-mono">Target: 3:00</div>
-          </div>
-          <div
-            class="bg-zinc-900/50 border border-white/5 p-5 rounded-2xl flex flex-col justify-center gap-1 hover:bg-zinc-900 hover:border-white/10 transition-all duration-300 group">
-            <span
-              class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider group-hover:text-zinc-400">Escalations</span>
-            <span class="text-2xl font-bold text-rose-500" id="stat-escalations">--</span>
-            <div class="text-[10px] text-rose-500/50 font-mono">Requires Attention</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-6 pb-8 h-full">
-
-      <!-- LEFT: Intelligence & Analytics (Col 3) -->
-      <div class="lg:col-span-3 flex flex-col gap-6 order-2 lg:order-1">
-
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1 mb-4">
-            <h3 class="text-lg font-medium text-white flex items-center gap-2">
-              <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                </path>
-              </svg>
-              Performance Insights
-            </h3>
-            <p class="text-xs text-zinc-500">Analysis of caller intent and demographics.</p>
-            <div class="h-px bg-zinc-800 w-full mt-2"></div>
-          </div>
-
-          <!-- Most Asked Card -->
-          <div
-            class="bg-gradient-to-b from-zinc-800 to-zinc-900 border border-white/10 rounded-2xl p-6 shadow-lg relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
-                </path>
-              </svg>
-            </div>
-            <div class="text-zinc-400 text-[10px] font-bold uppercase mb-2">Top Inquiry</div>
-            <p class="text-xl font-bold text-white leading-snug relative z-10" id="stat-most-asked">Loading...</p>
-            <div
-              class="mt-4 flex items-center gap-2 text-[10px] text-zinc-400 font-mono bg-black/20 inline-flex px-2 py-1 rounded-md">
-              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> 84% Confidence
-            </div>
-          </div>
-
-          <!-- Quality & Sources -->
-          <div class="space-y-4">
-            <div class="bg-zinc-900 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">Call Sources</span>
-              </div>
-              <div id="analytics-sources" class="space-y-4"></div>
-            </div>
-
-            <div class="bg-zinc-900 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">Top Regions</span>
-              </div>
-              <div id="analytics-geo" class="space-y-2"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- CENTER: Live Call List (Col 5) -->
-      <div class="lg:col-span-6 flex flex-col gap-4 order-1 lg:order-2 h-full">
-        <div class="flex flex-col gap-1 mb-4">
-          <h3 class="text-lg font-medium text-white flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
-              </path>
-            </svg>
-            Active Agent Monitor
-          </h3>
-          <p class="text-xs text-zinc-500">Real-time view of ongoing conversations.</p>
-          <div class="h-px bg-zinc-800 w-full mt-2"></div>
-        </div>
-
-        <!-- Calls List -->
-        <div
-          class="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden flex-1 shadow-2xl shadow-black/50 flex flex-col">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-zinc-400">
-              <thead
-                class="bg-zinc-950/80 text-zinc-500 uppercase text-[10px] tracking-wider font-bold border-b border-white/5 backdrop-blur-sm">
-                <tr>
-                  <th class="px-6 py-4">Agent</th>
-                  <th class="px-6 py-4">Status</th>
-                  <th class="px-6 py-4 text-right">Time</th>
-                  <th class="px-6 py-4 hidden sm:table-cell">Intent</th>
-                </tr>
-              </thead>
-              <tbody id="calls-table-body" class="divide-y divide-white/5">
-                <!-- JS Injection -->
-              </tbody>
-            </table>
-          </div>
-          <!-- Mobile View (Hidden on desktop) -->
-          <div id="calls-grid-mobile" class="lg:hidden p-4 space-y-3 hidden"></div>
-        </div>
-
-        <!-- Outcomes Bar -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-zinc-900 border border-white/5 rounded-2xl p-5" id="analytics-outcomes">
-            <!-- Outcome pills -->
-          </div>
-          <div class="bg-zinc-900 border border-white/5 rounded-2xl p-5 flex items-center justify-between group">
-            <div class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">System Health</div>
-            <div class="flex items-center gap-2">
-              <span class="text-lg font-bold text-emerald-400 group-hover:scale-110 transition-transform"
-                id="stat-quality-score">Good</span>
-              <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            </div>
-          </div>
+        <div class="text-2xl font-bold text-white tracking-tight">2,492</div>
+        <div class="text-[10px] text-zinc-600 mt-1 group-hover:text-zinc-500 transition-colors">Calls handled today
         </div>
       </div>
 
-      <!-- RIGHT: Transcript (Col 4) -->
-      <div class="lg:col-span-3 flex flex-col gap-4 order-3 h-full">
-        <div class="flex flex-col gap-1 mb-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-medium text-white flex items-center gap-2">
-              <div class="h-2 w-2 bg-red-500 rounded-full animate-pulse"></div> Live Interaction Log
-            </h3>
-            <span class="text-[10px] text-zinc-500 font-mono bg-zinc-900 px-2 py-1 rounded border border-white/5"
-              id="transcript-target">CONNECTING...</span>
-          </div>
-          <p class="text-xs text-zinc-500">Real-time transcript of the selected call.</p>
-          <div class="h-px bg-zinc-800 w-full mt-2"></div>
+      <!-- Card 2: Sentiment -->
+      <div
+        class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 cursor-pointer hover:border-white/20 transition-all group"
+        data-view="sentiment">
+        <div class="flex justify-between items-start mb-2">
+          <span
+            class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-400 transition-colors">Avg
+            Score</span>
+          <span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">+2.4%</span>
         </div>
+        <div class="text-2xl font-bold text-white tracking-tight">8.7/10</div>
+        <div class="text-[10px] text-zinc-600 mt-1 group-hover:text-zinc-500 transition-colors">Customer Sentiment</div>
+      </div>
 
-        <div
-          class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-4 py-5 overflow-y-auto relative flex flex-col gap-4 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] min-h-[500px]"
-          id="transcript-container">
-          <!-- Messages -->
-          <div class="mt-auto"></div>
+      <!-- Card 3: Issues (Topics) -->
+      <div
+        class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 cursor-pointer hover:border-white/20 transition-all group"
+        data-view="topics">
+        <div class="flex justify-between items-start mb-2">
+          <span
+            class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-400 transition-colors">Top
+            Issue</span>
+          <span class="text-xs font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">Alert</span>
+        </div>
+        <div class="text-2xl font-bold text-white tracking-tight">Refunds</div>
+        <div class="text-[10px] text-zinc-600 mt-1 group-hover:text-zinc-500 transition-colors">32% of all traffic</div>
+      </div>
+
+      <!-- Card 4: Efficiency -->
+      <div
+        class="bg-zinc-900/40 border text-zinc-600 border-white/5 rounded-xl p-4 hover:border-white/20 transition-all group">
+        <div class="flex justify-between items-start mb-2">
+          <span
+            class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-400 transition-colors">Efficiency</span>
+        </div>
+        <div class="text-2xl font-bold text-zinc-400 tracking-tight group-hover:text-zinc-200 transition-colors">94%
+        </div>
+        <div class="text-[10px] text-zinc-600 mt-1 group-hover:text-zinc-500 transition-colors">Resolution Rate</div>
+      </div>
+    </div>
+
+    <!-- Main Chart Container -->
+    <div class="flex-1 bg-zinc-900/20 border border-white/5 rounded-2xl p-6 relative flex flex-col">
+
+      <!-- Chart Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-white" id="main-chart-title">Volume Trends</h2>
+          <p class="text-xs text-zinc-500" id="main-chart-desc">Calls per hour over the last 24 hours</p>
+        </div>
+        <div class="flex gap-2">
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-lg border border-white/5">
+            <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+            <span class="text-xs font-medium text-zinc-300">Current Period</span>
+          </div>
+          <!-- <div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-lg border border-white/5 opacity-50">
+                    <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+                    <span class="text-xs font-medium text-zinc-500">Previous</span>
+                </div> -->
         </div>
       </div>
 
-    </main>
-  </div>
+      <!-- The Graph SVG -->
+      <div class="flex-1 w-full relative" id="chart-container">
+        <!-- Grid Lines Background -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" preserveAspectRatio="none">
+          <line x1="0" y1="25%" x2="100%" y2="25%" stroke="currentColor" stroke-dasharray="4 4" class="text-zinc-700">
+          </line>
+          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="currentColor" stroke-dasharray="4 4" class="text-zinc-700">
+          </line>
+          <line x1="0" y1="75%" x2="100%" y2="75%" stroke="currentColor" stroke-dasharray="4 4" class="text-zinc-700">
+          </line>
+        </svg>
+
+        <!-- Injected Content -->
+        <div id="main-chart" class="w-full h-full"></div>
+      </div>
+
+      <!-- X Axis Labels -->
+      <div class="flex justify-between text-[10px] text-zinc-600 font-medium px-2 mt-4">
+        <span>00:00</span>
+        <span>04:00</span>
+        <span>08:00</span>
+        <span>12:00</span>
+        <span>16:00</span>
+        <span>20:00</span>
+        <span>Now</span>
+      </div>
+
+    </div>
+
+  </main>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 
