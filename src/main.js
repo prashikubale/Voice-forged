@@ -165,7 +165,7 @@ const renderChart = () => {
     els.chartDesc.textContent = "Top 5 recurring topics by volume";
 
     const container = document.createElement('div');
-    container.className = "flex flex-col justify-center h-full gap-6 px-12";
+    container.className = "flex flex-col justify-center h-full gap-4 md:gap-6 px-4 md:px-12";
 
     const max = Math.max(...state.data.topics.map(t => t.value));
 

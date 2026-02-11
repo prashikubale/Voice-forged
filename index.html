@@ -45,28 +45,30 @@
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
-        <span class="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Engine Online • v2.0.4</span>
+        <span class="text-[9px] sm:text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Engine Online •
+          v2.0.4</span>
       </div>
 
       <!-- Headline Area -->
       <h1 id="hero-headline"
-        class="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-white max-w-4xl mx-auto leading-[1.1] min-h-[160px] flex flex-col justify-center">
+        class="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-white max-w-4xl mx-auto leading-[1.1] min-h-[120px] sm:min-h-[160px] flex flex-col justify-center">
         <!-- Content injected by JS -->
       </h1>
 
       <p
-        class="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light animate-[slideUp_0.9s_ease-out_0.4s_both]">
+        class="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light animate-[slideUp_0.9s_ease-out_0.4s_both] px-4">
         Orchestrate millions of concurrent voice agents with sub-50ms latency.
       </p>
 
       <!-- Buttons -->
-      <div class="flex flex-col sm:flex-row items-center gap-4 animate-[slideUp_1.1s_ease-out_0.6s_both]">
+      <div
+        class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0 animate-[slideUp_1.1s_ease-out_0.6s_both]">
         <a href="dashboard.html"
-          class="px-8 py-4 bg-white text-black rounded-full font-bold text-sm tracking-wide hover:bg-zinc-200 transition-colors">
+          class="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-sm tracking-wide hover:bg-zinc-200 transition-colors text-center order-1 sm:order-none">
           OPEN DASHBOARD
         </a>
         <a href="#"
-          class="px-8 py-4 bg-zinc-900 border border-zinc-800 text-white rounded-full font-bold text-sm tracking-wide hover:bg-zinc-800 transition-colors">
+          class="w-full sm:w-auto px-8 py-4 bg-zinc-900 border border-zinc-800 text-white rounded-full font-bold text-sm tracking-wide hover:bg-zinc-800 transition-colors text-center order-2 sm:order-none">
           READ DOCUMENTATION
         </a>
       </div>
@@ -75,7 +77,7 @@
 
     <!-- HERO PREVIEW (Dashboard UI Mockup) -->
     <div
-      class="relative w-full max-w-5xl mx-auto h-[350px] md:h-[550px] bg-zinc-950 border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl shadow-black/50 animate-[fadeIn_1.5s_ease-out_0.8s_both] group">
+      class="relative w-full max-w-5xl mx-auto h-[350px] md:h-[550px] bg-zinc-950 border border-white/10 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl shadow-black/50 animate-[fadeIn_1.5s_ease-out_0.8s_both] group mx-4">
       <!-- Top Bar (Mac OS dots + Search) -->
       <div class="h-8 bg-zinc-900 border-b border-white/5 flex items-center px-4 justify-between">
         <div class="flex gap-2">
@@ -105,7 +107,7 @@
         <div class="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
 
           <!-- Metric Row (4 Cards) -->
-          <div class="grid grid-cols-4 gap-4 h-24">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 h-auto md:h-24">
             <div class="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col justify-between">
               <div class="h-1.5 w-12 bg-white/20 rounded-full"></div>
               <div class="h-6 w-20 bg-white/10 rounded"></div>
@@ -177,7 +179,7 @@
     </div>
 
     <!-- Rest of content moved down for spacing -->
-    <div class="w-full mt-32">
+    <div class="w-full mt-24 md:mt-32">
       <!-- LOGO SCROLL (Trust Indicator) -->
       <div class="w-full overflow-hidden relative fade-sides"
         style="mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
@@ -229,7 +231,7 @@
 
 
     <!-- FEATURE STRIP -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-24 border-t border-white/5 pt-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-16 md:mt-24 border-t border-white/5 pt-12 md:pt-16">
       <!-- Feature 1 -->
       <div class="flex flex-col gap-3 reveal delay-100">
         <div
@@ -279,24 +281,24 @@
 
     <!-- GLOBAL INFRASTRUCTURE (Crazy Stuff) -->
     <section
-      class="w-full mt-32 relative rounded-3xl overflow-hidden bg-zinc-900/30 border border-white/5 p-10 md:p-20 reveal delay-100">
+      class="w-full mt-24 md:mt-32 relative rounded-3xl overflow-hidden bg-zinc-900/30 border border-white/5 p-6 md:p-20 reveal delay-100">
       <!-- Dot Grid BG -->
       <div class="absolute inset-0 opacity-10"
         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 24px 24px;"></div>
 
       <!-- Content -->
-      <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         <div>
           <div
-            class="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-widest mb-6">
+            class="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-widest mb-4 md:mb-6">
             Global Mesh
           </div>
-          <h2 class="text-4xl md:text-5xl font-medium text-white mb-6">Deployed on the Edge.</h2>
-          <p class="text-xl text-zinc-400 font-light leading-relaxed mb-8">
+          <h2 class="text-3xl md:text-5xl font-medium text-white mb-4 md:mb-6">Deployed on the Edge.</h2>
+          <p class="text-lg md:text-xl text-zinc-400 font-light leading-relaxed mb-6 md:mb-8">
             Our neural audio processing nodes are distributed across 32 zones, ensuring your agents speak faster than
             humanly possible.
           </p>
-          <div class="flex gap-8 border-t border-white/10 pt-8">
+          <div class="flex gap-8 border-t border-white/10 pt-6 md:pt-8">
             <div>
               <div class="text-3xl font-bold text-white mb-1 counter" data-target="32">32</div>
               <div class="text-xs text-zinc-500 uppercase tracking-wider">Regions</div>
@@ -310,7 +312,7 @@
 
         <!-- Visual Map/Graph -->
         <div
-          class="relative h-[300px] w-full bg-zinc-950 rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden">
+          class="relative h-[250px] md:h-[300px] w-full bg-zinc-950 rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden">
           <!-- Abstract Nodes -->
           <div
             class="absolute w-2 h-2 bg-emerald-500 rounded-full top-1/4 left-1/4 shadow-[0_0_20px_rgba(16,185,129,0.8)] animate-ping">
