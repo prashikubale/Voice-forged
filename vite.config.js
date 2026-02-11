@@ -12,7 +12,14 @@ export default defineConfig({
         }
     },
     server: {
-        host: true, // Listen on all addresses
-        open: true, // Attempt to open in browser automatically
+        host: true,
+        open: true,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3001',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
     }
 });

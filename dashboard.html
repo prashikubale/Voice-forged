@@ -2000,6 +2000,503 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ═════════════════════════════════════ */
+    /* VOICE AGENT MODAL                    */
+    /* ═════════════════════════════════════ */
+
+    /* Floating Action Button */
+    .voice-fab {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.35), 0 0 0 0 rgba(16, 185, 129, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      animation: fabPulse 2.5s infinite;
+    }
+
+    .voice-fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 40px rgba(16, 185, 129, 0.5);
+    }
+
+    .voice-fab svg {
+      width: 26px;
+      height: 26px;
+      color: #fff;
+    }
+
+    .voice-fab-label {
+      position: absolute;
+      right: 72px;
+      background: #18181b;
+      color: #d4d4d8;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      opacity: 0;
+      transform: translateX(8px);
+      transition: all 0.2s;
+      pointer-events: none;
+    }
+
+    .voice-fab:hover .voice-fab-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @keyframes fabPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.35), 0 0 0 0 rgba(16, 185, 129, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.35), 0 0 0 12px rgba(16, 185, 129, 0);
+      }
+    }
+
+    /* Modal Overlay */
+    .vm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .vm-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Modal Container */
+    .vm-modal {
+      background: #0c0c0f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      width: 480px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    .vm-overlay.open .vm-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Modal Header */
+    .vm-header {
+      padding: 24px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .vm-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fafafa;
+      margin-bottom: 4px;
+    }
+
+    .vm-subtitle {
+      font-size: 11.5px;
+      color: #3f3f46;
+    }
+
+    .vm-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+      color: #52525b;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .vm-close:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Voice Visualizer */
+    .vm-viz {
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .vm-orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.02));
+      border: 2px solid rgba(16, 185, 129, 0.15);
+      display: grid;
+      place-items: center;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .vm-orb.listening {
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.15), 0 0 80px rgba(16, 185, 129, 0.05);
+      animation: orbBreath 1.5s ease-in-out infinite;
+    }
+
+    .vm-orb.processing {
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 0 40px rgba(6, 182, 212, 0.15);
+      animation: orbSpin 2s linear infinite;
+    }
+
+    .vm-orb.done {
+      border-color: rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 60px rgba(16, 185, 129, 0.2);
+    }
+
+    .vm-orb.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.1);
+    }
+
+    .vm-orb svg {
+      width: 40px;
+      height: 40px;
+      color: #34d399;
+      transition: color 0.3s;
+    }
+
+    .vm-orb.processing svg {
+      color: #22d3ee;
+    }
+
+    .vm-orb.error svg {
+      color: #ef4444;
+    }
+
+    @keyframes orbBreath {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.06);
+      }
+    }
+
+    @keyframes orbSpin {
+      from {
+        border-color: rgba(6, 182, 212, 0.5);
+      }
+
+      50% {
+        border-color: rgba(16, 185, 129, 0.5);
+      }
+
+      to {
+        border-color: rgba(6, 182, 212, 0.5);
+      }
+    }
+
+    /* Waveform Bars */
+    .vm-wave {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 32px;
+    }
+
+    .vm-wave-bar {
+      width: 4px;
+      background: #10b981;
+      border-radius: 2px;
+      transition: height 0.15s;
+      height: 4px;
+    }
+
+    .vm-wave.active .vm-wave-bar {
+      animation: waveBar 0.6s ease-in-out infinite;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(4) {
+      animation-delay: 0.15s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(6) {
+      animation-delay: 0.05s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(7) {
+      animation-delay: 0.2s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(8) {
+      animation-delay: 0.1s;
+    }
+
+    .vm-wave.active .vm-wave-bar:nth-child(9) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes waveBar {
+
+      0%,
+      100% {
+        height: 4px;
+        opacity: 0.4;
+      }
+
+      50% {
+        height: 28px;
+        opacity: 1;
+      }
+    }
+
+    .vm-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: #52525b;
+      text-align: center;
+    }
+
+    .vm-status.active {
+      color: #34d399;
+    }
+
+    .vm-status.processing {
+      color: #22d3ee;
+    }
+
+    .vm-status.error {
+      color: #ef4444;
+    }
+
+    /* Transcript Area */
+    .vm-transcript {
+      margin: 0 24px;
+      background: #111114;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 80px;
+      max-height: 160px;
+      overflow-y: auto;
+      font-size: 12.5px;
+      color: #a1a1aa;
+      line-height: 1.6;
+    }
+
+    .vm-transcript:empty::before {
+      content: 'Your conversation will appear here...';
+      color: #27272a;
+      font-style: italic;
+    }
+
+    /* Extracted Data Preview */
+    .vm-result {
+      margin: 16px 24px;
+      background: rgba(16, 185, 129, 0.04);
+      border: 1px solid rgba(16, 185, 129, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      display: none;
+    }
+
+    .vm-result.show {
+      display: block;
+    }
+
+    .vm-result-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+
+    .vm-result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .vm-result-row:last-child {
+      border-bottom: none;
+    }
+
+    .vm-result-key {
+      font-size: 11.5px;
+      color: #52525b;
+      font-weight: 600;
+    }
+
+    .vm-result-val {
+      font-size: 11.5px;
+      color: #d4d4d8;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* Action Buttons */
+    .vm-actions {
+      padding: 20px 24px 24px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .vm-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .vm-btn-start {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+    }
+
+    .vm-btn-start:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+    }
+
+    .vm-btn-start:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .vm-btn-stop {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    .vm-btn-stop:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .vm-btn-secondary {
+      background: #18181b;
+      color: #a1a1aa;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .vm-btn-secondary:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #d4d4d8;
+    }
+
+    /* SMS status badge */
+    .vm-sms-status {
+      margin: 0 24px 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vm-sms-status.show {
+      display: flex;
+    }
+
+    .vm-sms-status.success {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    .vm-sms-status.fail {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    @media (max-width: 600px) {
+      .voice-fab {
+        bottom: 80px;
+        right: 16px;
+        width: 52px;
+        height: 52px;
+      }
+
+      .voice-fab-label {
+        display: none;
+      }
+
+      .vm-modal {
+        border-radius: 20px 20px 0 0;
+        max-width: 100vw;
+        margin-top: auto;
+      }
+
+      .vm-overlay {
+        align-items: flex-end;
+      }
+    }
   </style>
 </head>
 
