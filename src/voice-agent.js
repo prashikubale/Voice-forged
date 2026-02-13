@@ -1,8 +1,9 @@
 import { UltravoxSession, UltravoxSessionStatus } from 'ultravox-client';
+import { Conversation } from '@elevenlabs/client';
 
 // ============================================================
 // Voice Agent — Frontend Real-Time Controller
-// Connects: Browser Mic → UltraVox WebRTC → Conversational AI
+// Supports: UltraVox (primary) → ElevenLabs (fallback) → Demo
 // ============================================================
 
 const overlay = document.getElementById('vmOverlay');
@@ -24,7 +25,8 @@ if (overlay) {
 
     // ── State ────────────────────────────────────────────────────
     let state = 'idle';
-    let ultravoxSession = null;
+    let activeSession = null; // UltravoxSession or ElevenLabs Conversation
+    let activeMode = null;    // 'ultravox' | 'elevenlabs' | 'demo'
     let lastExtractedData = null;
 
     // ── Open / Close Modal ───────────────────────────────────────
@@ -34,12 +36,24 @@ if (overlay) {
     });
 
     function closeModal() {
-        if (ultravoxSession) {
-            ultravoxSession.leaveCall();
-            ultravoxSession = null;
-        }
+        endActiveSession();
         overlay.classList.remove('open');
         setTimeout(resetModal, 300);
+    }
+
+    function endActiveSession() {
+        if (!activeSession) return;
+        try {
+            if (activeMode === 'ultravox') {
+                activeSession.leaveCall();
+            } else if (activeMode === 'elevenlabs') {
+                activeSession.endSession();
+            }
+        } catch (e) {
+            console.warn('Error ending session:', e);
+        }
+        activeSession = null;
+        activeMode = null;
     }
 
     function resetModal() {
@@ -79,6 +93,7 @@ if (overlay) {
                 orb.classList.add('listening');
                 wave.classList.add('active');
                 statusEl.textContent = 'AI Agent is Online. Speak naturally.';
+                statusEl.classList.add('active');
                 break;
             case 'done':
                 orb.classList.add('done');
@@ -92,7 +107,14 @@ if (overlay) {
         }
     }
 
-    // ── Ultravox Integration ──────────────────────────────────────
+    // ── Provider Badge ───────────────────────────────────────────
+    function showProviderBadge(mode) {
+        const badge = mode === 'elevenlabs' ? '🔊 ElevenLabs' : '🎙️ UltraVox';
+        const color = mode === 'elevenlabs' ? '#8b5cf6' : '#22d3ee';
+        statusEl.innerHTML = `<span style="color:${color};font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:800;">${badge}</span><br>AI Agent is Online. Speak naturally.`;
+    }
+
+    // ── Main Entry Point ─────────────────────────────────────────
     window._voiceStart = startConversation;
     if (startBtn) startBtn.onclick = startConversation;
 
@@ -102,7 +124,7 @@ if (overlay) {
         resultEl.classList.remove('show');
 
         try {
-            // 1. Create session via Backend
+            // 1. Ask backend which provider to use
             const response = await fetch('/api/voice/create-session', { method: 'POST' });
 
             if (!response.ok) {
@@ -111,79 +133,147 @@ if (overlay) {
             }
 
             const result = await response.json();
+            const mode = result.data.mode;
+            activeMode = mode;
 
-            // 2. Initialize Ultravox Session
-            ultravoxSession = new UltravoxSession();
-            ultravoxSession.joinCall(result.data.joinUrl);
-
-            // 3. Setup Listeners
-            ultravoxSession.on('status', (status) => {
-                console.log('Ultravox Status:', status);
-                if (status === UltravoxSessionStatus.CONNECTED) {
-                    setState('listening');
-                    if (actionsEl) {
-                        actionsEl.innerHTML = `
-                        <button class="vm-btn vm-btn-stop" onclick="window._voiceStop()">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            End AI Call
-                        </button>`;
-                    }
-                } else if (status === UltravoxSessionStatus.DISCONNECTED) {
-                    if (state !== 'done') resetModal();
-                }
-            });
-
-            ultravoxSession.on('transcript', (transcript) => {
-                const isAgent = transcript.role === 'agent';
-                const color = isAgent ? '#22c55e' : '#cbd5e1';
-                const label = isAgent ? '🤖 Agent' : '👤 You';
-
-                transcriptEl.innerHTML += `<div style="margin-bottom: 8px; font-size: 13px;">
-                    <span style="color: ${color}; font-weight: 600;">${label}:</span> 
-                    <span style="color: #e2e8f0;">${transcript.text}</span>
-                </div>`;
-                transcriptEl.scrollTop = transcriptEl.scrollHeight;
-            });
-
-            // ── TOOL CALL HANDLING ──
-            ultravoxSession.on('client_tool_call', (toolCall) => {
-                if (toolCall.toolName === 'saveBooking') {
-                    const data = toolCall.args;
-                    console.log('AI Tool Call - Data Extracted:', data);
-
-                    lastExtractedData = data;
-                    displayResult({ extractedData: data });
-                    setState('done');
-
-                    toolCall.respond('Data sent to CRM.');
-
-                    // Stop call after success
-                    setTimeout(() => {
-                        if (ultravoxSession) {
-                            ultravoxSession.leaveCall();
-                            ultravoxSession = null;
-                        }
-                    }, 5000);
-                }
-            });
-
-            ultravoxSession.on('error', (err) => {
-                console.error('Ultravox error:', err);
-                setState('error');
-            });
+            // 2. Route to appropriate provider
+            if (mode === 'ultravox') {
+                await startUltravox(result.data);
+            } else if (mode === 'elevenlabs') {
+                await startElevenLabs(result.data);
+            } else {
+                // Demo mode
+                setState('listening');
+                showProviderBadge('demo');
+                statusEl.innerHTML = `<span style="color:#f59e0b;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:800;">⚠️ DEMO MODE</span><br>No voice API keys configured. Set ULTRAVOX_API_KEY or ELEVENLABS_API_KEY + ELEVENLABS_AGENT_ID in backend .env`;
+                transcriptEl.innerHTML = `<div style="color:#f59e0b;font-size:12px;padding:8px;">Demo mode active — configure API keys in backend/.env to enable live voice AI.</div>`;
+            }
 
         } catch (err) {
             console.error('Call failed:', err);
             setState('error');
-            statusEl.textContent = 'Connection Error. Is ULTRAVOX_API_KEY valid?';
+            statusEl.textContent = err.message || 'Connection Error. Check API keys.';
         }
     }
 
-    window._voiceStop = () => {
-        if (ultravoxSession) {
-            ultravoxSession.leaveCall();
-            ultravoxSession = null;
+    // ══════════════════════════════════════════════════════════════
+    // PROVIDER 1: UltraVox
+    // ══════════════════════════════════════════════════════════════
+    async function startUltravox(data) {
+        const session = new UltravoxSession();
+        activeSession = session;
+        session.joinCall(data.joinUrl);
+
+        session.on('status', (status) => {
+            console.log('Ultravox Status:', status);
+            if (status === UltravoxSessionStatus.CONNECTED) {
+                setState('listening');
+                showProviderBadge('ultravox');
+                showEndButton();
+            } else if (status === UltravoxSessionStatus.DISCONNECTED) {
+                if (state !== 'done') resetModal();
+            }
+        });
+
+        session.on('transcript', (transcript) => {
+            appendTranscript(transcript.role === 'agent', transcript.text);
+        });
+
+        session.on('client_tool_call', (toolCall) => {
+            if (toolCall.toolName === 'saveBooking') {
+                handleBookingData(toolCall.args);
+                toolCall.respond('Data sent to CRM.');
+                setTimeout(() => { endActiveSession(); }, 5000);
+            }
+        });
+
+        session.on('error', (err) => {
+            console.error('Ultravox error:', err);
+            setState('error');
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // PROVIDER 2: ElevenLabs Conversational AI
+    // ══════════════════════════════════════════════════════════════
+    async function startElevenLabs(data) {
+        try {
+            const conversation = await Conversation.startSession({
+                signedUrl: data.signedUrl,
+                onConnect: () => {
+                    console.log('ElevenLabs connected');
+                    setState('listening');
+                    showProviderBadge('elevenlabs');
+                    showEndButton();
+                },
+                onDisconnect: () => {
+                    console.log('ElevenLabs disconnected');
+                    if (state !== 'done') resetModal();
+                },
+                onError: (error) => {
+                    console.error('ElevenLabs error:', error);
+                    setState('error');
+                    statusEl.textContent = 'ElevenLabs connection error.';
+                },
+                onMessage: (message) => {
+                    console.log('ElevenLabs message:', message);
+                    // Handle transcript messages
+                    if (message.type === 'transcript' || message.type === 'agent_response') {
+                        const isAgent = message.role === 'agent' || message.type === 'agent_response';
+                        const text = message.text || message.message || '';
+                        if (text) appendTranscript(isAgent, text);
+                    }
+                },
+                clientTools: {
+                    saveBooking: async (params) => {
+                        handleBookingData(params);
+                        setTimeout(() => { endActiveSession(); }, 5000);
+                        return 'Booking data captured successfully.';
+                    },
+                },
+            });
+
+            activeSession = conversation;
+
+        } catch (err) {
+            console.error('ElevenLabs session failed:', err);
+            setState('error');
+            statusEl.textContent = 'Failed to connect to ElevenLabs. Check Agent ID.';
         }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // SHARED HELPERS
+    // ══════════════════════════════════════════════════════════════
+    function appendTranscript(isAgent, text) {
+        const color = isAgent ? '#22c55e' : '#cbd5e1';
+        const label = isAgent ? '🤖 Agent' : '👤 You';
+        transcriptEl.innerHTML += `<div style="margin-bottom: 8px; font-size: 13px;">
+            <span style="color: ${color}; font-weight: 600;">${label}:</span> 
+            <span style="color: #e2e8f0;">${text}</span>
+        </div>`;
+        transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    }
+
+    function showEndButton() {
+        if (actionsEl) {
+            actionsEl.innerHTML = `
+            <button class="vm-btn vm-btn-stop" onclick="window._voiceStop()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                End AI Call
+            </button>`;
+        }
+    }
+
+    function handleBookingData(data) {
+        console.log('AI Tool Call - Data Extracted:', data);
+        lastExtractedData = data;
+        displayResult({ extractedData: data });
+        setState('done');
+    }
+
+    window._voiceStop = () => {
+        endActiveSession();
         if (state !== 'done') resetModal();
     };
 
@@ -217,7 +307,6 @@ if (overlay) {
             resultEl.classList.add('show');
             waSection.classList.add('show');
 
-            // Pre-fill phone from extracted or target
             if (data.targetNumber) {
                 waInput.value = data.targetNumber;
             } else if (data.extractedData.phone_number) {

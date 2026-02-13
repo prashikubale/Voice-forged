@@ -3,9 +3,9 @@
 // ============================================================
 
 const { getIntentService } = require('../services/intent.service');
+const { getTaskQueueService } = require('../services/taskQueue.service');
 const ApiResponse = require('../utils/response');
-const logger = require('../utils/logger');
-const { v4: uuidv4 } = require('uuid');
+const Interaction = require('../models/interaction.model');
 
 class VoiceController {
     /**
@@ -13,141 +13,278 @@ class VoiceController {
      * Processes a transcript through LLM → validates → triggers action
      */
     static async processTranscript(req, res) {
-        const requestId = uuidv4();
         const { transcript } = req.body;
+        const startTime = process.hrtime.bigint();
+        const tenantId = req.account?._id;
 
-        logger.info('Transcript processing request received', {
-            requestId,
-            transcriptLength: transcript.length,
+        req.log.info('Transcript received for processing', {
+            transcriptLength: transcript?.length || 0,
+            tenantId,
         });
 
         try {
-            // ─── SIMULATION MODE (If no LLM Key) ───
+            // ─── SIMULATION MODE (If no LLM Key) ───────────────
             if (!process.env.LLM_API_KEY) {
-                logger.warn('LLM_API_KEY missing - returning SIMULATED data for MVP testing');
-                await new Promise(r => setTimeout(r, 1500)); // Fake delay
-                return ApiResponse.success(res, {
-                    data: {
-                        requestId,
-                        intent: 'book_meeting',
-                        confidence: 0.99,
-                        actionTaken: false,
-                        targetNumber: process.env.WHATSAPP_TARGET_NUMBER || process.env.SMS_TO_NUMBER,
-                        extractedData: {
-                            full_name: 'Demo User',
-                            phone_number: process.env.WHATSAPP_TARGET_NUMBER || '9100000000',
-                            preferred_date: 'Tomorrow',
-                            preferred_time: '10:00 AM',
-                            purpose_of_meeting: 'MVP Demo Testing',
-                            additional_notes: 'Encrypted channel established.',
-                        },
-                        message: 'Simulation: Data extracted successfully',
+                req.log.warn('LLM_API_KEY missing — running in simulation mode');
+
+                const simData = {
+                    requestId: req.id,
+                    intent: 'book_meeting',
+                    confidence: 0.99,
+                    actionTaken: false,
+                    extractedData: {
+                        full_name: 'Demo User',
+                        phone_number: '9100000000',
+                        preferred_date: 'Tomorrow',
+                        preferred_time: '10:00 AM',
+                        purpose_of_meeting: 'Simulated booking',
                     },
-                    message: 'Simulation Mode (No LLM Key)',
+                    mode: 'simulation',
+                };
+
+                // Fire-and-forget persistence
+                Interaction.record({
+                    correlationId: req.id,
+                    tenantId,
+                    transcript,
+                    intent: simData.intent,
+                    confidenceScore: simData.confidence,
+                    actionTaken: false,
+                    extractedData: simData.extractedData,
+                    status: 'success',
+                    stage: 'complete',
+                    processingTimeMs: 0,
+                    metadata: { mode: 'simulation' },
+                }, req.log);
+
+                return ApiResponse.success(res, {
+                    data: simData,
+                    message: 'Simulation mode — LLM key not configured',
                 });
             }
 
+            // ─── LIVE MODE ──────────────────────────────────────
             const intentService = getIntentService();
-            const result = await intentService.processTranscript(transcript);
+            const result = await intentService.processTranscript(transcript, req.log);
+            const durationMs = Number(process.hrtime.bigint() - startTime) / 1e6;
+
+            // Fire-and-forget persistence
+            Interaction.record({
+                correlationId: req.id,
+                tenantId,
+                transcript,
+                intent: result.llmResult?.intent,
+                confidenceScore: result.llmResult?.confidence_score,
+                actionTaken: result.actionTaken || false,
+                extractedData: result.llmResult?.data,
+                status: result.success ? 'success' : 'failure',
+                stage: result.stage,
+                errors: result.errors || (result.error ? [result.error] : undefined),
+                processingTimeMs: Math.round(durationMs),
+            }, req.log);
 
             if (result.success) {
-                logger.info('Transcript processing succeeded', { requestId, actionTaken: result.actionTaken });
+                req.log.info('Transcript processing succeeded', {
+                    actionTaken: result.actionTaken,
+                    durationMs: Math.round(durationMs),
+                });
+
                 return ApiResponse.success(res, {
                     data: {
-                        requestId,
+                        requestId: req.id,
                         intent: result.llmResult?.intent,
                         confidence: result.llmResult?.confidence_score,
                         actionTaken: result.actionTaken || false,
                         extractedData: result.llmResult?.data,
-                        targetNumber: process.env.WHATSAPP_TARGET_NUMBER || process.env.SMS_TO_NUMBER,
+                        taskId: result.taskId || null,
                         message: result.message,
                     },
-                    message: result.message,
                 });
-            } else {
-                logger.warn('Transcript processing failed at stage', {
-                    requestId,
-                    stage: result.stage,
-                    errors: result.errors,
-                });
-                return ApiResponse.badRequest(res, result.errors?.[0] || result.error || 'Processing failed', result.errors);
             }
+
+            req.log.warn('Transcript processing failed', {
+                stage: result.stage,
+                errors: result.errors,
+            });
+            return ApiResponse.badRequest(
+                res,
+                result.errors?.[0] || result.error || 'Processing failed',
+                result.errors,
+            );
         } catch (error) {
-            logger.error('Transcript processing error', { requestId, error: error.message });
-            return ApiResponse.error(res, { message: 'Failed to process transcript. Please try again.' });
+            const durationMs = Number(process.hrtime.bigint() - startTime) / 1e6;
+            req.log.error('Transcript processing exception', {
+                error: error.message,
+                durationMs: Math.round(durationMs),
+            });
+
+            // Persist failure
+            Interaction.record({
+                correlationId: req.id,
+                tenantId,
+                transcript,
+                status: 'failure',
+                errors: [error.message],
+                processingTimeMs: Math.round(durationMs),
+            }, req.log);
+
+            return ApiResponse.error(res, { message: 'Failed to process transcript.' });
         }
     }
 
     /**
      * POST /api/voice/create-session
-     * Creates an UltraVox call session (proxied from backend for security)
+     * Creates a voice call session — tries UltraVox first, then ElevenLabs, then demo
      */
     static async createSession(req, res) {
-        const apiKey = process.env.ULTRAVOX_API_KEY;
+        const ultravoxKey = process.env.ULTRAVOX_API_KEY;
+        const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
+        const elevenLabsAgentId = process.env.ELEVENLABS_AGENT_ID;
 
-        if (!apiKey) {
-            // Return a demo mode response when no API key
-            logger.info('UltraVox key not set — returning demo mode');
-            return ApiResponse.success(res, {
-                data: { mode: 'demo', sessionId: `demo_${Date.now()}` },
-                message: 'Demo mode — UltraVox API key not configured',
-            });
-        }
+        // ── 1. Try UltraVox ──────────────────────────────────────
+        if (ultravoxKey) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
 
-        try {
-            const response = await fetch('https://api.ultravox.ai/api/calls', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': apiKey,
-                },
-                body: JSON.stringify({
-                    systemPrompt: "You are the Voice Forge AI, a professional meeting scheduler. Your goal is to have a natural, helpful conversation to help the user book a meeting. Greet the user, ask for their name, purpose, date and time. Confirm details. Be natural and professional.",
-                    model: 'fixie-ai/ultravox-70B'
-                }),
-            });
+            try {
+                req.log.info('Creating UltraVox voice session');
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                logger.error('UltraVox session creation failed', { status: response.status, error: errorText });
-                throw new Error(`UltraVox API returned ${response.status}`);
+                const response = await fetch('https://api.ultravox.ai/api/calls', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': ultravoxKey,
+                    },
+                    body: JSON.stringify({
+                        systemPrompt:
+                            'You are the Voice Forge AI, a professional meeting scheduler. ' +
+                            'Greet the user, ask for their name, purpose, preferred date and time. ' +
+                            'Confirm details before finalising. Be natural and professional.',
+                        model: 'fixie-ai/ultravox-70B',
+                    }),
+                    signal: controller.signal,
+                });
+
+                clearTimeout(timeout);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    req.log.error('UltraVox API error', {
+                        status: response.status,
+                        body: errorText.slice(0, 500),
+                    });
+                    throw new Error(`UltraVox API returned ${response.status}`);
+                }
+
+                const data = await response.json();
+                req.log.info('UltraVox session created', { callId: data.callId });
+
+                return ApiResponse.created(res, {
+                    data: {
+                        joinUrl: data.joinUrl,
+                        callId: data.callId,
+                        mode: 'ultravox',
+                    },
+                    message: 'Voice session created (UltraVox)',
+                });
+            } catch (error) {
+                clearTimeout(timeout);
+                req.log.warn('UltraVox failed, checking ElevenLabs fallback', { error: error.message });
+                // Fall through to ElevenLabs
             }
-
-            const data = await response.json();
-            logger.info('UltraVox session created', { callId: data.callId });
-
-            return ApiResponse.created(res, {
-                data: {
-                    joinUrl: data.joinUrl,
-                    callId: data.callId,
-                    mode: 'live',
-                },
-                message: 'Voice session created',
-            });
-        } catch (error) {
-            logger.error('Session creation error', { error: error.message });
-            return ApiResponse.error(res, { message: 'Failed to create voice session' });
         }
+
+        // ── 2. Try ElevenLabs ────────────────────────────────────
+        if (elevenLabsKey && elevenLabsAgentId) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+
+            try {
+                req.log.info('Creating ElevenLabs Conversational AI session');
+
+                // Get a signed URL for the agent
+                const response = await fetch(
+                    `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${elevenLabsAgentId}`,
+                    {
+                        method: 'GET',
+                        headers: { 'xi-api-key': elevenLabsKey },
+                        signal: controller.signal,
+                    }
+                );
+
+                clearTimeout(timeout);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    req.log.error('ElevenLabs API error', {
+                        status: response.status,
+                        body: errorText.slice(0, 500),
+                    });
+                    throw new Error(`ElevenLabs API returned ${response.status}`);
+                }
+
+                const data = await response.json();
+                req.log.info('ElevenLabs session created', { agentId: elevenLabsAgentId });
+
+                return ApiResponse.created(res, {
+                    data: {
+                        signedUrl: data.signed_url,
+                        agentId: elevenLabsAgentId,
+                        mode: 'elevenlabs',
+                    },
+                    message: 'Voice session created (ElevenLabs)',
+                });
+            } catch (error) {
+                clearTimeout(timeout);
+
+                if (error.name === 'AbortError') {
+                    req.log.error('ElevenLabs session creation timed out');
+                    return ApiResponse.error(res, {
+                        message: 'Voice session creation timed out',
+                        statusCode: 504,
+                    });
+                }
+
+                req.log.error('ElevenLabs session creation failed', { error: error.message });
+                return ApiResponse.error(res, { message: 'Failed to create voice session' });
+            }
+        }
+
+        // ── 3. Demo mode ─────────────────────────────────────────
+        req.log.info('No voice API keys set — demo mode returned');
+        return ApiResponse.success(res, {
+            data: { mode: 'demo', sessionId: `demo_${Date.now()}` },
+            message: 'Demo mode — No voice API keys configured',
+        });
     }
 
     /**
      * GET /api/voice/health
-     * Health check for the voice processing pipeline
+     * Deep health check — verifies service dependencies
      */
     static async healthCheck(req, res) {
-        const status = {
+        const mongoose = require('mongoose');
+        const taskQueue = getTaskQueueService();
+
+        const services = {
             llm: !!process.env.LLM_API_KEY,
             sms: !!(process.env.SMS_ACCOUNT_SID && process.env.SMS_AUTH_TOKEN),
             ultravox: !!process.env.ULTRAVOX_API_KEY,
+            elevenlabs: !!(process.env.ELEVENLABS_API_KEY && process.env.ELEVENLABS_AGENT_ID),
+            database: mongoose.connection.readyState === 1,
         };
+
+        const allHealthy = Object.values(services).every(Boolean);
 
         return ApiResponse.success(res, {
             data: {
-                status: 'operational',
-                services: status,
+                status: allHealthy ? 'healthy' : 'degraded',
+                services,
+                uptime: Math.round(process.uptime()),
+                taskQueue: taskQueue.getStats(),
                 timestamp: new Date().toISOString(),
             },
-            message: 'Voice pipeline health check',
+            message: allHealthy ? 'All systems operational' : 'One or more services degraded',
         });
     }
 }

@@ -5,7 +5,9 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const logger = require('../utils/logger');
 
-const SYSTEM_PROMPT = `You are a strict intent extraction engine for a voice automation system. 
+const LLM_TIMEOUT_MS = parseInt(process.env.LLM_TIMEOUT_MS, 10) || 30000;
+
+const SYSTEM_PROMPT = `You are a strict intent extraction engine for a voice automation system.
 You receive a transcript of a voice conversation and MUST extract structured data from it.
 
 RULES:
@@ -50,52 +52,79 @@ class LLMService {
         const apiKey = process.env.LLM_API_KEY;
         if (!apiKey) {
             logger.warn('LLM_API_KEY not set — LLM service will not function');
-            this.client = null;
+            this.ready = false;
             return;
         }
-        const genAI = new GoogleGenerativeAI(apiKey);
-        this.model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        this.client = true;
-    }
-
-    async processTranscript(transcript) {
-        if (!this.client) {
-            throw new Error('LLM service not configured — missing API key');
-        }
-
-        logger.info('Processing transcript with LLM', { transcriptLength: transcript.length });
 
         try {
-            const result = await this.model.generateContent({
-                contents: [
-                    { role: 'user', parts: [{ text: `${SYSTEM_PROMPT}\n\nTRANSCRIPT:\n${transcript}` }] },
-                ],
-                generationConfig: {
-                    temperature: 0.1,
-                    topP: 0.8,
-                    maxOutputTokens: 1024,
-                    responseMimeType: 'application/json',
-                },
+            const genAI = new GoogleGenerativeAI(apiKey);
+            this.model = genAI.getGenerativeModel({
+                model: process.env.LLM_MODEL || 'gemini-2.0-flash',
             });
+            this.ready = true;
+            logger.info('LLM service initialised', {
+                model: process.env.LLM_MODEL || 'gemini-2.0-flash',
+            });
+        } catch (err) {
+            logger.error('LLM service initialisation failed', { error: err.message });
+            this.ready = false;
+        }
+    }
+
+    /**
+     * Sends a transcript to the LLM and returns structured JSON.
+     *
+     * @param {string}      transcript  User voice transcript
+     * @param {pino.Logger} [reqLog]    Optional request-scoped logger
+     * @returns {Promise<object>}       Parsed intent object
+     */
+    async processTranscript(transcript, reqLog) {
+        const log = reqLog || logger;
+
+        if (!this.ready) {
+            throw new Error('LLM service not configured — missing or invalid API key');
+        }
+
+        log.info('Sending transcript to LLM', {
+            transcriptLength: transcript?.length || 0,
+        });
+
+        // AbortController for timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
+
+        try {
+            const result = await this.model.generateContent(
+                {
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [{ text: `${SYSTEM_PROMPT}\n\nTRANSCRIPT:\n${transcript}` }],
+                        },
+                    ],
+                    generationConfig: {
+                        temperature: 0.1,
+                        topP: 0.8,
+                        maxOutputTokens: 1024,
+                        responseMimeType: 'application/json',
+                    },
+                },
+                { signal: controller.signal },
+            );
+
+            clearTimeout(timeout);
 
             const responseText = result.response.text().trim();
-            logger.debug('Raw LLM response received', { responseLength: responseText.length });
+            log.debug('Raw LLM response received', { responseLength: responseText.length });
 
-            // Parse and validate JSON
-            let parsed;
-            try {
-                parsed = JSON.parse(responseText);
-            } catch (parseError) {
-                // Try to extract JSON from response if wrapped in markdown
-                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    parsed = JSON.parse(jsonMatch[0]);
-                } else {
-                    throw new Error('LLM returned non-JSON response');
-                }
+            const parsed = this._parseJSON(responseText);
+
+            // Structural sanity check
+            if (!parsed.intent || typeof parsed.confidence_score !== 'number') {
+                throw new Error('LLM response missing required fields (intent / confidence_score)');
             }
 
-            logger.info('LLM processing complete', {
+            log.info('LLM processing complete', {
                 intent: parsed.intent,
                 confidence: parsed.confidence_score,
                 actionRequired: parsed.action_required,
@@ -103,8 +132,32 @@ class LLMService {
 
             return parsed;
         } catch (error) {
-            logger.error('LLM processing failed', { error: error.message });
+            clearTimeout(timeout);
+
+            if (error.name === 'AbortError') {
+                log.error('LLM request timed out', { timeoutMs: LLM_TIMEOUT_MS });
+                throw new Error(`LLM request timed out after ${LLM_TIMEOUT_MS}ms`);
+            }
+
+            log.error('LLM processing failed', { error: error.message });
             throw new Error(`LLM processing failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Attempts to parse raw LLM text as JSON.
+     * Falls back to extracting the first JSON block if wrapped in markdown.
+     */
+    _parseJSON(text) {
+        try {
+            return JSON.parse(text);
+        } catch (_) {
+            // Gemini sometimes wraps output in ```json ... ```
+            const match = text.match(/\{[\s\S]*\}/);
+            if (match) {
+                return JSON.parse(match[0]);
+            }
+            throw new Error('LLM returned non-JSON response');
         }
     }
 }

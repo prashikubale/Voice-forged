@@ -1,0 +1,62 @@
+# ============================================================
+# Docker Compose — Voice Forge Full Stack (Local Development)
+# ============================================================
+# Usage:
+#   docker compose up              — start everything
+#   docker compose up -d           — start in background
+#   docker compose down            — stop everything
+#   docker compose logs -f api     — follow API logs
+# ============================================================
+
+services:
+  # ── MongoDB ─────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: voiceforge-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: voice-forge
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Voice Forge API ─────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: voiceforge-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/voice-forge
+      JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_IN_PRODUCTION_USE_64_RANDOM_CHARS}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      ULTRAVOX_API_KEY: ${ULTRAVOX_API_KEY:-}
+      SMS_ACCOUNT_SID: ${SMS_ACCOUNT_SID:-}
+      SMS_AUTH_TOKEN: ${SMS_AUTH_TOKEN:-}
+      SMS_FROM_NUMBER: ${SMS_FROM_NUMBER:-}
+      SMS_TO_NUMBER: ${SMS_TO_NUMBER:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+volumes:
+  mongo_data:
+    driver: local
